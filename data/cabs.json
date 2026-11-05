@@ -1,0 +1,9 @@
+[
+  {"driver": "Ramesh Kumar",  "seats": 4, "destination": "Delhi",  "time_slot": "Morning", "status":  0},
+  {"driver": "Suresh Yadav",  "seats": 2, "destination": "Delhi",  "time_slot": "Morning"},
+  {"driver": "Mahesh Sharma", "seats": 4, "destination": "Delhi",  "time_slot": "Evening"},
+  {"driver": "Anil Verma",    "seats": 3, "destination": "Delhi",  "time_slot": "Night"},
+  {"driver": "Vikram Singh",  "seats": 4, "destination": "Jaipur", "time_slot": "Morning"},
+  {"driver": "Rajesh Meena",  "seats": 1, "destination": "Jaipur", "time_slot": "Afternoon"},
+  {"driver": "Deepak Saini",  "seats": 4, "destination": "Jaipur", "time_slot": "Night"}
+]
