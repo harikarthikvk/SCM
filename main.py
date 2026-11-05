@@ -51,5 +51,5 @@ def loadRequests():
 
 
 if __name__ == '__main__':
-    loadCabs()
     loadRequests()
+    loadCabs()
