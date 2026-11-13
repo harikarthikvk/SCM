@@ -1,98 +1,58 @@
 [
-    {
-        "cab-id": 1,
-        "driver": "Ramesh Kumar",
-        "time_slot": "Morning",
-        "destination": "Delhi",
-        "seats": 4,
-        "departed": true,
-        "students": [
-            {
-                "request-id": 15,
-                "name": "Krish",
-                "timeslot": "Morning",
-                "destination": "Delhi",
-                "timeOfRequest": 1794589200,
-                "year": 3
-            },
-            {
-                "request-id": 23,
-                "name": "Dhruv",
-                "timeslot": "Morning",
-                "destination": "Delhi",
-                "timeOfRequest": 1794603600,
-                "year": 3
-            },
-            {
-                "request-id": 31,
-                "name": "Vihaan",
-                "timeslot": "Morning",
-                "destination": "Delhi",
-                "timeOfRequest": 1794618000,
-                "year": 3
-            },
-            {
-                "request-id": 39,
-                "name": "Shaurya",
-                "timeslot": "Morning",
-                "destination": "Delhi",
-                "timeOfRequest": 1794632400,
-                "year": 3
-            }
-        ]
-    },
-    {
-        "cab-id": 2,
-        "driver": "Suresh Yadav",
-        "time_slot": "Morning",
-        "destination": "Delhi",
-        "seats": 2,
-        "departed": false,
-        "students": []
-    },
-    {
-        "cab-id": 3,
-        "driver": "Mahesh Sharma",
-        "time_slot": "Evening",
-        "destination": "Delhi",
-        "seats": 4,
-        "departed": false,
-        "students": []
-    },
-    {
-        "cab-id": 4,
-        "driver": "Anil Verma",
-        "time_slot": "Night",
-        "destination": "Delhi",
-        "seats": 3,
-        "departed": false,
-        "students": []
-    },
-    {
-        "cab-id": 5,
-        "driver": "Vikram Singh",
-        "time_slot": "Morning",
-        "destination": "Jaipur",
-        "seats": 4,
-        "departed": false,
-        "students": []
-    },
-    {
-        "cab-id": 6,
-        "driver": "Rajesh Meena",
-        "time_slot": "Afternoon",
-        "destination": "Jaipur",
-        "seats": 1,
-        "departed": false,
-        "students": []
-    },
-    {
-        "cab-id": 7,
-        "driver": "Deepak Saini",
-        "time_slot": "Night",
-        "destination": "Jaipur",
-        "seats": 4,
-        "departed": false,
-        "students": []
-    }
+  {
+    "cab-id": 1,
+    "driver": "Ramesh Kumar",
+    "seats": 4,
+    "destination": "DELHI",
+    "time_slot": "MORNING",
+    "departed": false
+  },
+  {
+    "cab-id": 2,
+    "driver": "Suresh Yadav",
+    "seats": 2,
+    "destination": "DELHI",
+    "time_slot": "MORNING",
+    "departed": false
+  },
+  {
+    "cab-id": 3,
+    "driver": "Mahesh Sharma",
+    "seats": 4,
+    "destination": "DELHI",
+    "time_slot": "EVENING",
+    "departed": false
+  },
+  {
+    "cab-id": 4,
+    "driver": "Anil Verma",
+    "seats": 3,
+    "destination": "DELHI",
+    "time_slot": "Night",
+    "departed": false
+  },
+  {
+    "cab-id": 5,
+    "driver": "Vikram Singh",
+    "seats": 4,
+    "destination": "JAIPUR",
+    "time_slot": "MORNING",
+    "departed": false
+  },
+  {
+    "cab-id": 6,
+    "driver": "Rajesh Meena",
+    "seats": 1,
+    "destination": "JAIPUR",
+    "time_slot": "Afternoon",
+    "departed": false
+  },
+  {
+    "cab-id": 7,
+    "driver": "Deepak Saini",
+    "seats": 4,
+    "destination": "JAIPUR",
+    "time_slot": "Night",
+    "departed": false
+  }
 ]

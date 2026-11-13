@@ -210,7 +210,7 @@ def findMatch(reqid):
 def addrequest():
     global requests
     name = input("Enter Name: ")
-    if name == "" or name == " ":
+str    if name.strip() == "":
         print("Invalid Name!")
         return
     try:
@@ -256,7 +256,7 @@ def addrequest():
 
     request = RideRequest(
         requestId=requests,
-        name=name,
+        name=name.strip,
         timeslot=timeslot,
         destination=destination,
         timeOfRequest=int(datetime.now().timestamp()),
@@ -319,7 +319,7 @@ def main():
                 print("Program exiting after saving")
                 break
             else:
-                print("Please enter a number from 1 to 5")
+                print("Please enter a number from 1 to 6")
 
     except (KeyboardInterrupt, EOFError):
         print("Program exiting after saving")
