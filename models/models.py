@@ -7,7 +7,7 @@ class RideRequest:
     name: str
     timeslot: TimeSlot
     destination: Destination
-    timeOfRequest: float
+    timeOfRequest: int
     year: int
 
 @dataclass

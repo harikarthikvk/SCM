@@ -78,14 +78,14 @@ def viewQueue():
                 )
 
 def viewCabs():
-    print("CabID Name Timeslot Destination Seats CurrentStatus")
+    print("CabID Name Timeslot Destination AvailableSeats CurrentStatus")
     for i in cabs.values():
         if i.departed:
             print(i.cabId,
                   i.name,
                   i.timeslot.value,
                   i.destination.value,
-                  i.seat,
+                  str(len(i.students)) + "/" + str(i.seat),
                   "DEPARTED")
             print("Students in cab")
             print("RequestID Name Year")
@@ -99,7 +99,7 @@ def viewCabs():
                   i.seat,
                   "WAITING")
 
-def dispatchCab(cabid):
+def dispatchCabbyID(cabid):
     cab = cabs.get(cabid)
     if cab is None:
         print("Invalid Cab Trip ID")
@@ -119,6 +119,7 @@ def dispatchCab(cabid):
             empty += 1
     if empty == cab.seat:
         print("No matching requests found")
+        return
     if empty > 0:
         print(f"Cab {cabid} matched with {len(cab.students)} students with {empty} empty seats")
     else:
@@ -159,27 +160,34 @@ def findMatch(reqid):
 def addrequest():
     global requests
     name = input("Enter Name: ")
-
+    if name == "" or name == " ":
+        print("Invalid Name!")
+        return
     try:
         year = int(input("Enter Year: "))
-
+        if year > 5 or year < 1:
+            print("Invalid Year!")
+            return
         timeslot_code = int(
             input("Enter TimeSlot Code (Morning(1), Afternoon(2), Evening(3), Night(4)): ")
         )
-
+        if timeslot_code > 4 or timeslot_code < 1:
+            print("Invalid TimeSlot Code!")
+            return
         destination_code = int(
             input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
         )
-
+        if destination_code > 2 or destination_code < 1:
+            print("Invalid Destination Code!")
+            return
     except ValueError:
         print("Please enter valid integer values.")
         return
 
     timeslot = getTimeSlot(timeslot_code)
     destination = getDestination(destination_code)
-    if year > 5:
-        print("Invalid Year!")
-        return
+
+
     if timeslot is None:
         print("Invalid Timeslot!")
         return
@@ -195,7 +203,7 @@ def addrequest():
         name=name,
         timeslot=timeslot,
         destination=destination,
-        timeOfRequest=datetime.now().timestamp(),
+        timeOfRequest=int(datetime.now().timestamp()),
         year=year
     )
     heapq.heappush(queues[request.destination, request.timeslot],
@@ -212,9 +220,10 @@ def main():
             print("1. Request a ride")
             print("2. View cabs and waiting students")
             print("3. Find matches")
-            print("4. Dispatch a cab")
-            print("5. Quit")
-            choice = input("Choose action (1-5): ").strip()
+            print("4. Dispatch a cab by Cab ID")
+            print("5. Dispatch a cab by Destination and Timeslot")
+            print("6. Quit")
+            choice = input("Choose action (1-6): ").strip()
 
             if choice == "1":
                 addrequest()
@@ -234,10 +243,15 @@ def main():
                     print("Request ID are integers")
             elif choice == "4":
                 try:
-                    dispatchCab(int(input("Enter Trip ID: ")))
+                    dispatchCabbyID(int(input("Enter Trip ID: ")))
                 except ValueError:
                     print("Trip ID are integers")
             elif choice == "5":
+                try:
+                    dispatchCabbyID(int(input("Enter Trip ID: ")))
+                except ValueError:
+                    print("Trip ID are integers")
+            elif choice == "6":
                 print("Program exiting")
                 break
             else:
