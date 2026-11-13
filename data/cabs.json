@@ -10,7 +10,7 @@
   {
     "cab-id": 2,
     "driver": "Suresh Yadav",
-    "seats": 6,
+    "seats": 2,
     "destination": "DELHI",
     "time_slot": "MORNING",
     "departed": false

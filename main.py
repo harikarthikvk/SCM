@@ -1,7 +1,7 @@
 import heapq
 from datetime import datetime
 
-from enums.enums import TimeSlot, Destination
+from enums.enums import TimeSlot, Destination, getTimeSlot, getDestination
 from models.models import RideRequest,Cab
 import json
 queues = {
@@ -9,8 +9,9 @@ queues = {
     for d in Destination
     for t in TimeSlot
 }
+requestMap = {}
 cabs: dict[int, Cab] = {}
-
+global requests
 def loadCabs():
     with open("data/cabs.json", "r") as c:
         data = json.load(c)
@@ -42,6 +43,7 @@ def loadCabs():
         )
 
 def loadRequests():
+    global requests
     with open("data/requests.json", "r") as r:
         data = json.load(r)
     for req in data:
@@ -54,7 +56,8 @@ def loadRequests():
                     year=req["year"]
                 )
         heapq.heappush(queues[reqobj.destination, reqobj.timeslot], (-reqobj.year, reqobj.timeOfRequest, reqobj.requestId, reqobj))
-
+        requestMap[reqobj.requestId] = (reqobj.destination, reqobj.timeslot)
+        requests  += 1
 def viewQueue():
     for d in Destination:
         for t in TimeSlot:
@@ -105,6 +108,7 @@ def dispatchCab(cabid):
     for i in range(cab.seat):
         try:
             priority, request_time, request_id, req = heapq.heappop(queues[destination, timeslot])
+            requestMap.pop(req.requestId, None)
             cab.students.append(req)
         except IndexError:
             empty += 1
@@ -113,6 +117,81 @@ def dispatchCab(cabid):
     else:
         print(f"Cab {cabid} matched with {len(cab.students)} students")
     cab.departed = True
+
+def findMatch(reqid):
+    request = requestMap.get(reqid)
+    if request is None:
+        print("Invalid Cab Trip ID")
+        return
+    destination, timeslot = request
+    currentavailableseats = 0
+    availableCabs = {}
+    for i in cabs.values():
+        if not i.departed:
+            if i.timeslot == timeslot and i.destination == destination:
+                currentavailableseats += i.seat
+                availableCabs.setdefault(currentavailableseats, i)
+    if currentavailableseats > 0:
+        for position, i in enumerate(sorted(queues[destination, timeslot])):
+            if i[2] == reqid:
+                print("Current Position in queue: ", position+1)
+                print("Current Available seats", currentavailableseats)
+                if currentavailableseats < position+1:
+                    print("No matches found currently")
+                else:
+                    for y in availableCabs.keys():
+                        if y >= position+1:
+                            cab = availableCabs.get(y)
+                            print("Cab Details:")
+                            print("Cab ID: ", cab.cabId)
+                            print("Driver Name: ", cab.name)
+                            break
+    else:
+        print("No cabs found currently")
+def addrequest():
+    global requests
+    name = input("Enter Name: ")
+
+    try:
+        year = int(input("Enter Year: "))
+
+        timeslot_code = int(
+            input("Enter TimeSlot Code (Morning(1), Afternoon(2), Evening(3), Night(4)): ")
+        )
+
+        destination_code = int(
+            input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
+        )
+
+    except ValueError:
+        print("Please enter valid integer values.")
+        return
+
+    timeslot = getTimeSlot(timeslot_code)
+    destination = getDestination(destination_code)
+
+    if timeslot is None:
+        print("Invalid Timeslot!")
+        return
+
+    if destination is None:
+        print("Invalid Destination!")
+        return
+
+    requests += 1
+
+    request = RideRequest(
+        requestId=requests,
+        name=name,
+        timeslot=timeslot,
+        destination=destination,
+        timeOfRequest=datetime.now().timestamp(),
+        year=year
+    )
+    heapq.heappush(queues[request.destination, request.timeslot],
+                   (-request.year, request.timeOfRequest, request.requestId, request))
+    requestMap[request.requestId] = (request.destination, request.timeslot)
+
 def main():
     loadCabs()
     loadRequests()
@@ -123,23 +202,29 @@ def main():
         print("3. Find matches")
         print("4. Dispatch a cab")
         print("5. Quit")
-        choice = input("Choose action (1-5):-").strip()
+        choice = input("Choose action (1-5): ").strip()
 
         if choice == "1":
-            print("2")
+            addrequest()
         elif choice == "2":
-            choice = input("1. See available cabs\n2. See queue:-").strip()
+            choice = input("1. See available cabs\n2. See queue\nChoose action (1 or 2): ").strip()
             if choice == "1":
-                viewCabs()
+                viewCabs() #add3/4 seats issue
             elif choice == "2":
                 viewQueue()
             else:
                 print("Please enter 1 or 2")
 
         elif choice == "3":
-            print("2")
+            try:
+                findMatch(int(input("Enter Request ID: ")))
+            except ValueError:
+                print("Request ID are integers")
         elif choice == "4":
-            dispatchCab(int(input("Enter Trip ID")))
+            try:
+                dispatchCab(int(input("Enter Trip ID: ")))
+            except ValueError:
+                print("Trip ID are integers")
         elif choice == "5":
             print("Program exiting")
             break
@@ -148,4 +233,5 @@ def main():
 
 
 if __name__ == '__main__':
+    requests = 0
     main()
