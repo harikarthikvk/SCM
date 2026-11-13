@@ -12,6 +12,7 @@ queues = {
 requestMap = {}
 cabs: dict[int, Cab] = {}
 global requests
+
 def loadCabs():
     with open("data/cabs.json", "r") as c:
         data = json.load(c)
@@ -57,7 +58,9 @@ def loadRequests():
                 )
         heapq.heappush(queues[reqobj.destination, reqobj.timeslot], (-reqobj.year, reqobj.timeOfRequest, reqobj.requestId, reqobj))
         requestMap[reqobj.requestId] = (reqobj.destination, reqobj.timeslot)
-        requests  += 1
+        if requests < reqobj.requestId:
+            requests  = reqobj.requestId
+
 def viewQueue():
     for d in Destination:
         for t in TimeSlot:
@@ -73,6 +76,7 @@ def viewQueue():
                     req.year,
                     datetime.fromtimestamp(req.timeOfRequest)
                 )
+
 def viewCabs():
     print("CabID Name Timeslot Destination Seats CurrentStatus")
     for i in cabs.values():
@@ -94,6 +98,7 @@ def viewCabs():
                   i.destination.value,
                   i.seat,
                   "WAITING")
+
 def dispatchCab(cabid):
     cab = cabs.get(cabid)
     if cab is None:
@@ -112,6 +117,8 @@ def dispatchCab(cabid):
             cab.students.append(req)
         except IndexError:
             empty += 1
+    if empty == cab.seat:
+        print("No matching requests found")
     if empty > 0:
         print(f"Cab {cabid} matched with {len(cab.students)} students with {empty} empty seats")
     else:
@@ -121,7 +128,7 @@ def dispatchCab(cabid):
 def findMatch(reqid):
     request = requestMap.get(reqid)
     if request is None:
-        print("Invalid Cab Trip ID")
+        print("Invalid Request ID")
         return
     destination, timeslot = request
     currentavailableseats = 0
@@ -148,6 +155,7 @@ def findMatch(reqid):
                             break
     else:
         print("No cabs found currently")
+
 def addrequest():
     global requests
     name = input("Enter Name: ")
@@ -169,7 +177,9 @@ def addrequest():
 
     timeslot = getTimeSlot(timeslot_code)
     destination = getDestination(destination_code)
-
+    if year > 5:
+        print("Invalid Year!")
+        return
     if timeslot is None:
         print("Invalid Timeslot!")
         return
@@ -191,45 +201,50 @@ def addrequest():
     heapq.heappush(queues[request.destination, request.timeslot],
                    (-request.year, request.timeOfRequest, request.requestId, request))
     requestMap[request.requestId] = (request.destination, request.timeslot)
+    print("Request ID:", requests)
 
 def main():
-    loadCabs()
-    loadRequests()
-    while True:
-        print("\n===Student Cab Management===")
-        print("1. Request a ride")
-        print("2. View cabs and waiting students")
-        print("3. Find matches")
-        print("4. Dispatch a cab")
-        print("5. Quit")
-        choice = input("Choose action (1-5): ").strip()
+    try:
+        loadCabs()
+        loadRequests()
+        while True:
+            print("\n===Student Cab Management===")
+            print("1. Request a ride")
+            print("2. View cabs and waiting students")
+            print("3. Find matches")
+            print("4. Dispatch a cab")
+            print("5. Quit")
+            choice = input("Choose action (1-5): ").strip()
 
-        if choice == "1":
-            addrequest()
-        elif choice == "2":
-            choice = input("1. See available cabs\n2. See queue\nChoose action (1 or 2): ").strip()
             if choice == "1":
-                viewCabs() #add3/4 seats issue
+                addrequest()
             elif choice == "2":
-                viewQueue()
-            else:
-                print("Please enter 1 or 2")
+                choice = input("1. See available cabs\n2. See queue\nChoose action (1 or 2): ").strip()
+                if choice == "1":
+                    viewCabs() #add3/4 seats issue
+                elif choice == "2":
+                    viewQueue()
+                else:
+                    print("Please enter 1 or 2")
 
-        elif choice == "3":
-            try:
-                findMatch(int(input("Enter Request ID: ")))
-            except ValueError:
-                print("Request ID are integers")
-        elif choice == "4":
-            try:
-                dispatchCab(int(input("Enter Trip ID: ")))
-            except ValueError:
-                print("Trip ID are integers")
-        elif choice == "5":
-            print("Program exiting")
-            break
-        else:
-            print("Please enter a number from 1 to 5")
+            elif choice == "3":
+                try:
+                    findMatch(int(input("Enter Request ID: ")))
+                except ValueError:
+                    print("Request ID are integers")
+            elif choice == "4":
+                try:
+                    dispatchCab(int(input("Enter Trip ID: ")))
+                except ValueError:
+                    print("Trip ID are integers")
+            elif choice == "5":
+                print("Program exiting")
+                break
+            else:
+                print("Please enter a number from 1 to 5")
+
+    except (KeyboardInterrupt, EOFError):
+        print("Program exiting after saving")
 
 
 if __name__ == '__main__':
