@@ -246,6 +246,12 @@ def addrequest():
         print("Invalid Destination!")
         return
 
+    available = checkAvailableCabs(destination, timeslot)
+
+    if not available:
+        print("\nNo open cabs currently available for this trip.")
+        print("Your request will be added to the waiting queue.")
+
     requests += 1
 
     request = RideRequest(
@@ -260,6 +266,14 @@ def addrequest():
                    (-request.year, request.timeOfRequest, request.requestId, request))
     requestMap[request.requestId] = (request.destination, request.timeslot)
     print("Request ID:", requests)
+
+def checkAvailableCabs(destination, timeslot):
+    for cab in cabs.values():
+        if (cab.destination == destination
+                and cab.timeslot == timeslot
+                and not cab.departed):
+            return True
+    return False
 
 def main():
     try:
