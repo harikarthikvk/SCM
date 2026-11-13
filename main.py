@@ -11,7 +11,6 @@ queues = {
 }
 requestMap = {}
 cabs: dict[int, Cab] = {}
-global requests
 
 def loadCabs():
     with open("data/cabs.json", "r") as c:
@@ -42,6 +41,11 @@ def loadCabs():
                 departed=cab.get("departed", False)
             )
         )
+    global requests
+
+    for cab in cabs.values():
+        for student in cab.students:
+            requests = max(requests, student.requestId)
 
 def loadRequests():
     global requests
@@ -61,6 +65,52 @@ def loadRequests():
         if requests < reqobj.requestId:
             requests  = reqobj.requestId
 
+def saveCabs():
+    data = []
+    for cab in cabs.values():
+        cab_data = {
+            "cab-id": cab.cabId,
+            "driver": cab.name,
+            "time_slot": cab.timeslot.value,
+            "destination": cab.destination.value,
+            "seats": cab.seat,
+            "departed": cab.departed,
+            "students": []
+        }
+
+        for s in cab.students:
+            cab_data["students"].append({
+                "request-id": s.requestId,
+                "name": s.name,
+                "timeslot": s.timeslot.value,
+                "destination": s.destination.value,
+                "timeOfRequest": s.timeOfRequest,
+                "year": s.year
+            })
+
+        data.append(cab_data)
+    with open("data/cabs.json", "w") as c:
+        json.dump(data, c, indent=4)
+
+def saveRequests():
+    data = []
+
+    for queue in queues.values():
+        for req in queue:
+            r = req[3]
+
+            data.append({
+                "request-id": r.requestId,
+                "name": r.name,
+                "timeslot": r.timeslot.value,
+                "destination": r.destination.value,
+                "timeOfRequest": r.timeOfRequest,
+                "year": r.year
+            })
+
+    with open("data/requests.json", "w") as c:
+        json.dump(data, c, indent=4)
+
 def viewQueue():
     for d in Destination:
         for t in TimeSlot:
@@ -78,7 +128,7 @@ def viewQueue():
                 )
 
 def viewCabs():
-    print("CabID Name Timeslot Destination AvailableSeats CurrentStatus")
+    print("CabID Name Timeslot Destination Seats CurrentStatus")
     for i in cabs.values():
         if i.departed:
             print(i.cabId,
@@ -96,7 +146,7 @@ def viewCabs():
                   i.name,
                   i.timeslot.value,
                   i.destination.value,
-                  i.seat,
+                  "0/" + str(i.seat),
                   "WAITING")
 
 def dispatchCabbyID(cabid):
@@ -252,7 +302,7 @@ def main():
                 except ValueError:
                     print("Trip ID are integers")
             elif choice == "6":
-                print("Program exiting")
+                print("Program exiting after saving")
                 break
             else:
                 print("Please enter a number from 1 to 5")
@@ -260,6 +310,13 @@ def main():
     except (KeyboardInterrupt, EOFError):
         print("Program exiting after saving")
 
+    finally:
+        try:
+            saveCabs()
+            saveRequests()
+            print("Successfully saved and exited")
+        except OSError as e:
+            print("Error saving data:", e)
 
 if __name__ == '__main__':
     requests = 0
