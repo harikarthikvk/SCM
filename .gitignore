@@ -1,7 +1,6 @@
 
 # PyCharm
 .idea/
-data/
 # Python cache files
 __pycache__/
 *.py[cod]

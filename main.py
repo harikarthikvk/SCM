@@ -175,6 +175,18 @@ def dispatchCabbyID(cabid):
     else:
         print(f"Cab {cabid} matched with {len(cab.students)} students")
     cab.departed = True
+    saveCabs()
+    saveRequests()
+
+def findCabs(destination, timeslot):
+    for i in cabs.values():
+        if not i.departed and i.destination == destination and i.timeslot == timeslot:
+            print(i.cabId,
+                  i.name,
+                  i.timeslot.value,
+                  i.destination.value,
+                  i.seat,
+                  "Waiting")
 
 def findMatch(reqid):
     request = requestMap.get(reqid)
@@ -210,7 +222,7 @@ def findMatch(reqid):
 def addrequest():
     global requests
     name = input("Enter Name: ")
-str    if name.strip() == "":
+    if name.strip() == "":
         print("Invalid Name!")
         return
     try:
@@ -256,7 +268,7 @@ str    if name.strip() == "":
 
     request = RideRequest(
         requestId=requests,
-        name=name.strip,
+        name=name.strip(),
         timeslot=timeslot,
         destination=destination,
         timeOfRequest=int(datetime.now().timestamp()),
@@ -266,6 +278,8 @@ str    if name.strip() == "":
                    (-request.year, request.timeOfRequest, request.requestId, request))
     requestMap[request.requestId] = (request.destination, request.timeslot)
     print("Request ID:", requests)
+    saveCabs()
+    saveRequests()
 
 def checkAvailableCabs(destination, timeslot):
     for cab in cabs.values():
@@ -284,10 +298,9 @@ def main():
             print("1. Request a ride")
             print("2. View cabs and waiting students")
             print("3. Find matches")
-            print("4. Dispatch a cab by Cab ID")
-            print("5. Dispatch a cab by Destination and Timeslot")
-            print("6. Quit")
-            choice = input("Choose action (1-6): ").strip()
+            print("4. Dispatch a cab")
+            print("5. Quit")
+            choice = input("Choose action (1-5): ").strip()
 
             if choice == "1":
                 addrequest()
@@ -307,19 +320,30 @@ def main():
                     print("Request ID are integers")
             elif choice == "4":
                 try:
+                    timeslot_code = int(
+                        input("Enter TimeSlot Code (Morning(1), Afternoon(2), Evening(3), Night(4)): ")
+                    )
+                    if timeslot_code > 4 or timeslot_code < 1:
+                        print("Invalid TimeSlot Code!")
+                        return
+                    destination_code = int(
+                        input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
+                    )
+                    if destination_code > 2 or destination_code < 1:
+                        print("Invalid Destination Code!")
+                        return
+
+                    timeslot = getTimeSlot(timeslot_code)
+                    destination = getDestination(destination_code)
+                    findCabs(destination, timeslot)
                     dispatchCabbyID(int(input("Enter Trip ID: ")))
                 except ValueError:
-                    print("Trip ID are integers")
+                    print("Please enter valid integer values.")
             elif choice == "5":
-                try:
-                    dispatchCabbyID(int(input("Enter Trip ID: ")))
-                except ValueError:
-                    print("Trip ID are integers")
-            elif choice == "6":
                 print("Program exiting after saving")
                 break
             else:
-                print("Please enter a number from 1 to 6")
+                print("Please enter a number from 1 to 5")
 
     except (KeyboardInterrupt, EOFError):
         print("Program exiting after saving")
