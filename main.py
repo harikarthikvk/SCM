@@ -378,13 +378,13 @@ def main():
                     )
                     if timeslot_code > 4 or timeslot_code < 1:
                         print("Time slot must be 1–4.")
-                        return
+                        continue
                     destination_code = int(
                         input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
                     )
                     if destination_code > 2 or destination_code < 1:
                         print("Invalid Destination Code!")
-                        return
+                        continue
 
                     timeslot = getTimeSlot(timeslot_code)
                     destination = getDestination(destination_code)
