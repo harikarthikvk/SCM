@@ -155,7 +155,7 @@ def dispatchCabbyID(cabid):
         print("Invalid Cab Trip ID")
         return
     if cab.departed is True:
-        print("Cab already departed")
+        print("Cab has already left.")
         return
     destination = cab.destination
     timeslot = cab.timeslot
@@ -168,15 +168,33 @@ def dispatchCabbyID(cabid):
         except IndexError:
             empty += 1
     if empty == cab.seat:
-        print("No matching requests found")
+        print(f"No students waiting for {destination.value}, {timeslot.value}. Cab not sent.")
         return
     if empty > 0:
         print(f"Cab {cabid} matched with {len(cab.students)} students with {empty} empty seats")
     else:
         print(f"Cab {cabid} matched with {len(cab.students)} students")
     cab.departed = True
-    saveCabs()
-    saveRequests()
+    try:
+        saveCabs()
+        saveRequests()
+    except FileNotFoundError:
+        print("JSON file not found!")
+
+    except PermissionError:
+        print("Permission denied while saving the file!")
+
+    except json.JSONDecodeError:
+        print("Invalid JSON format!")
+
+    except TypeError:
+        print("Object is not JSON serializable!")
+
+    except OSError as e:
+        print("File operation error:", e)
+
+    except Exception as e:
+        print("Unexpected error:", e)
 
 def findCabs(destination, timeslot):
     for i in cabs.values():
@@ -191,7 +209,7 @@ def findCabs(destination, timeslot):
 def findMatch(reqid):
     request = requestMap.get(reqid)
     if request is None:
-        print("Invalid Request ID")
+        print("No waiting request with ID 12 (it may have already left in a cab).")
         return
     destination, timeslot = request
     currentavailableseats = 0
@@ -223,18 +241,18 @@ def addrequest():
     global requests
     name = input("Enter Name: ")
     if name.strip() == "":
-        print("Invalid Name!")
+        print("Name can't be empty.")
         return
     try:
         year = int(input("Enter Year: "))
         if year > 5 or year < 1:
-            print("Invalid Year!")
+            print("Year must be between 1 and 5.")
             return
         timeslot_code = int(
             input("Enter TimeSlot Code (Morning(1), Afternoon(2), Evening(3), Night(4)): ")
         )
         if timeslot_code > 4 or timeslot_code < 1:
-            print("Invalid TimeSlot Code!")
+            print("Time slot must be 1–4.")
             return
         destination_code = int(
             input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
@@ -243,7 +261,7 @@ def addrequest():
             print("Invalid Destination Code!")
             return
     except ValueError:
-        print("Please enter valid integer values.")
+        print("Please enter a number.")
         return
 
     timeslot = getTimeSlot(timeslot_code)
@@ -278,8 +296,26 @@ def addrequest():
                    (-request.year, request.timeOfRequest, request.requestId, request))
     requestMap[request.requestId] = (request.destination, request.timeslot)
     print("Request ID:", requests)
-    saveCabs()
-    saveRequests()
+    try:
+        saveCabs()
+        saveRequests()
+    except FileNotFoundError:
+        print("JSON file not found!")
+
+    except PermissionError:
+        print("Permission denied while saving the file!")
+
+    except json.JSONDecodeError:
+        print("Invalid JSON format!")
+
+    except TypeError:
+        print("Object is not JSON serializable!")
+
+    except OSError as e:
+        print("File operation error:", e)
+
+    except Exception as e:
+        print("Unexpected error:", e)
 
 def checkAvailableCabs(destination, timeslot):
     for cab in cabs.values():
@@ -291,8 +327,25 @@ def checkAvailableCabs(destination, timeslot):
 
 def main():
     try:
-        loadCabs()
-        loadRequests()
+        try:
+            loadCabs()
+            loadRequests()
+
+        except FileNotFoundError as e:
+            print(f"Data file not found: {e.filename}")
+            print("Please make sure data/cabs.json and data/requests.json exist.")
+
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON file: {e}")
+
+        except PermissionError as e:
+            print(f"Permission denied: {e}")
+
+        except (KeyError, ValueError, TypeError, AttributeError) as e:
+            print(f"Invalid data in JSON file: {e}")
+
+        except OSError as e:
+            print(f"File operation error: {e}")
         while True:
             print("\n===Student Cab Management===")
             print("1. Request a ride")
@@ -317,14 +370,14 @@ def main():
                 try:
                     findMatch(int(input("Enter Request ID: ")))
                 except ValueError:
-                    print("Request ID are integers")
+                    print("Request ID must be a number.")
             elif choice == "4":
                 try:
                     timeslot_code = int(
                         input("Enter TimeSlot Code (Morning(1), Afternoon(2), Evening(3), Night(4)): ")
                     )
                     if timeslot_code > 4 or timeslot_code < 1:
-                        print("Invalid TimeSlot Code!")
+                        print("Time slot must be 1–4.")
                         return
                     destination_code = int(
                         input("Enter Destination Code (Delhi(1), Jaipur(2)): ")
@@ -338,23 +391,16 @@ def main():
                     findCabs(destination, timeslot)
                     dispatchCabbyID(int(input("Enter Trip ID: ")))
                 except ValueError:
-                    print("Please enter valid integer values.")
+                    print("Please enter a number.")
             elif choice == "5":
-                print("Program exiting after saving")
+                print("Program exiting")
                 break
             else:
                 print("Please enter a number from 1 to 5")
 
     except (KeyboardInterrupt, EOFError):
-        print("Program exiting after saving")
+        print("Program exiting")
 
-    finally:
-        try:
-            saveCabs()
-            saveRequests()
-            print("Successfully saved and exited")
-        except OSError as e:
-            print("Error saving data:", e)
 
 if __name__ == '__main__':
     requests = 0
