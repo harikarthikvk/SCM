@@ -206,36 +206,70 @@ def findCabs(destination, timeslot):
                   i.seat,
                   "Waiting")
 
+
 def findMatch(reqid):
     request = requestMap.get(reqid)
+
     if request is None:
-        print(f"No waiting request with ID {reqid} (it may have already left in a cab).")
+        print(f"No waiting request with ID {reqid} "
+              "(it may have already left in a cab).")
         return
+
     destination, timeslot = request
-    currentavailableseats = 0
-    availableCabs = {}
-    for i in cabs.values():
-        if not i.departed:
-            if i.timeslot == timeslot and i.destination == destination:
-                currentavailableseats += i.seat
-                availableCabs.setdefault(currentavailableseats, i)
-    if currentavailableseats > 0:
-        for position, i in enumerate(sorted(queues[destination, timeslot])):
-            if i[2] == reqid:
-                print("Current Position in queue: ", position+1)
-                print("Current Available seats", currentavailableseats)
-                if currentavailableseats < position+1:
-                    print("No matches found currently")
-                else:
-                    for y in availableCabs.keys():
-                        if y >= position+1:
-                            cab = availableCabs.get(y)
-                            print("Cab Details:")
-                            print("Cab ID: ", cab.cabId)
-                            print("Driver Name: ", cab.name)
-                            break
-    else:
-        print("No cabs found currently")
+
+    availableCabs = []
+
+    for cab in cabs.values():
+        if (not cab.departed
+                and cab.timeslot == timeslot
+                and cab.destination == destination):
+            availableCabs.append(cab)
+
+    if not availableCabs:
+        print("No cabs found currently.")
+        return
+    totalSeats = sum(cab.seat for cab in availableCabs)
+    sortedQueue = sorted(queues[destination, timeslot])
+    position = None
+
+    for index, item in enumerate(sortedQueue):
+        if item[2] == reqid:
+            position = index
+            break
+
+    if position is None:
+        print("Request not found in queue.")
+        return
+
+    print("\nYour Position in Queue:", position + 1)
+    print("Currently Available Seats:", totalSeats)
+
+    if position >= totalSeats:
+        print("No matches found currently.")
+        print("There are not enough seats ahead of your request.")
+        return
+    matchedStudents = sortedQueue[:totalSeats]
+
+    print("\nStudents currently expected to travel together:")
+    print("----------------------------------------------")
+    print("Request ID   Name             Year")
+
+    for item in matchedStudents:
+        student = item[3]
+
+        print(student.requestId,
+              student.name,
+              student.year)
+
+    print("----------------------------------------------")
+    print("You are currently matched!")
+    print("\nAvailable Cabs:")
+
+    for cab in availableCabs:
+        print("Cab ID:", cab.cabId)
+        print("Driver:", cab.name)
+        print("Seats:", cab.seat)
+        print()
 
 def addrequest():
     global requests
@@ -360,7 +394,7 @@ def main():
             elif choice == "2":
                 choice = input("1. See available cabs\n2. See queue\nChoose action (1 or 2): ").strip()
                 if choice == "1":
-                    viewCabs() #add3/4 seats issue
+                    viewCabs()
                 elif choice == "2":
                     viewQueue()
                 else:
