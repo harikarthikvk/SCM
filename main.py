@@ -209,7 +209,7 @@ def findCabs(destination, timeslot):
 def findMatch(reqid):
     request = requestMap.get(reqid)
     if request is None:
-        print("No waiting request with ID 12 (it may have already left in a cab).")
+        print(f"No waiting request with ID {reqid} (it may have already left in a cab).")
         return
     destination, timeslot = request
     currentavailableseats = 0
