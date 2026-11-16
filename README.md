@@ -187,4 +187,4 @@ Here *n* is the number of waiting requests, *k* the number of seats in a cab (at
 
 ---
 
-*A note on how this README was made:* I wrote this README with AI (Claude) by giving it the entire repository, then reviewed it against the code. The app itself is my own work. I believe that not using AI for tasks like writing documentation is wasted potential: it turns a working codebase into clear docs quickly, which leaves more time for the actual engineering.
+*A note on how this README was made:* I wrote this README with AI (Claude) by giving it the entire repository, then reviewed it against the code. The app itself is my own work. I believe that not using AI for tasks like writing documentation is wasted potential: it turns a working codebase into clear docs quickly, which leaves more time for the actual engineering. Also AI was used for grammer and formatting the ui in `finmatches()`
